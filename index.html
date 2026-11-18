@@ -1,4 +1,24 @@
 <!DOCTYPE html>
+<!--
+==================================================================
+  auraii : COMMENT LIRE CE FICHIER (index.html)
+==================================================================
+  Ce fichier contient TOUT le site, en 3 grandes parties :
+
+  PARTIE 1  (style)   : l’APPARENCE (couleurs, tailles, animations)
+  PARTIE 2  (body)     : la STRUCTURE (menu, fenêtres, zone principale)
+  PARTIE 3  (script)  : le COMPORTEMENT (clics, comptes, projets, likes)
+
+  Chaque partie est découpée en blocs numérotés avec un bandeau
+  « ===== TITRE ===== ». Utilisez la recherche (Ctrl+F) sur un titre.
+
+  Pour modifier :
+   - une couleur .................. PARTIE 1, bloc 1
+   - le texte de l’accueil ........ PARTIE 3, fonction home()
+   - les catégories ............... PARTIE 3, bloc 1 (CATS)
+   - la liste de mots interdits ... PARTIE 3, bloc EXPLORER (BAD)
+==================================================================
+-->
 <html lang="fr">
 <head>
 <meta charset="utf-8">
@@ -8,6 +28,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Inter+Tight:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+/* ################ PARTIE 1 : APPARENCE (CSS) ################ */
+/* ======== 1. COULEURS ET RÉGLAGES GÉNÉRAUX (changez les couleurs ici : --g = le vert, --bg = le fond noir) ======== */
 :root{--bg:#040705;--p1:#0A100C;--p2:#101811;--line:#1C271F;--tx:#E8F2EA;--mu:#7C8C81;--g:#2DFF8A;--g2:#0C5A33;--on:#031007;
 box-sizing:border-box;color-scheme:dark;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);scroll-behavior:smooth}
 :root[data-theme="dark"]{--bg:#040705}
@@ -21,7 +43,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 ::selection{background:var(--g);color:var(--on)}
 :focus-visible{outline:2px solid var(--g);outline-offset:3px}
 .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
-/* nav */
+/* ======== 2. BARRE DE NAVIGATION (le menu en haut) ======== */
 nav{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:50;display:flex;align-items:center;gap:4px;padding:6px 6px 6px 18px;border:1px solid var(--line);border-radius:99px;background:rgba(8,13,10,.72);backdrop-filter:blur(16px);width:min(560px,calc(100% - 24px))}
 .logo{font:800 20px Syne,sans-serif;letter-spacing:-.04em;background:none;border:0;padding:0;margin-right:auto;display:flex;align-items:center;gap:8px}
 .logo i{width:9px;height:9px;border-radius:50%;background:var(--g);box-shadow:0 0 12px var(--g)}
@@ -31,7 +53,7 @@ nav{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transf
 .btn:hover{box-shadow:0 0 28px rgba(45,255,138,.45)}.btn:active{transform:scale(.97)}
 .btn.ghost{background:transparent;color:var(--tx);box-shadow:inset 0 0 0 1px var(--line)}.btn.ghost:hover{box-shadow:inset 0 0 0 1px var(--g)}
 .btn:disabled{opacity:.6;cursor:wait}
-/* hero */
+/* ======== 3. ACCUEIL : le grand écran d’entrée avec le mot « auraii » ======== */
 .hero{position:relative;min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:120px 0 24px;overflow:hidden;isolation:isolate}
 .hero::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(520px circle at var(--mx,70%) var(--my,35%),rgba(45,255,138,.22),transparent 65%),radial-gradient(900px circle at 85% 110%,var(--g2),transparent 60%)}
 .hero::after{content:"";position:absolute;inset:0;z-index:-1;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:72px 72px;mask-image:radial-gradient(ellipse at 50% 40%,#000 10%,transparent 70%);opacity:.5}
@@ -42,12 +64,12 @@ nav{position:fixed;top:calc(14px + env(safe-area-inset-top,0px));left:50%;transf
 .big span{display:inline-block;transform:translateY(105%);animation:up .9s cubic-bezier(.2,.9,.2,1) forwards;animation-delay:calc(var(--i)*70ms + 150ms)}
 .big span:last-child{color:var(--g);text-shadow:0 0 60px rgba(45,255,138,.5)}
 @keyframes up{to{transform:none}}
-/* marquee */
+/* ======== 4. BANDE DÉFILANTE d’exemples de descriptions ======== */
 .mq{border-block:1px solid var(--line);overflow:hidden;padding:16px 0;background:var(--p1)}
 .mq div{display:flex;gap:48px;width:max-content;animation:mq 60s linear infinite;color:var(--mu);font-size:18px}
 .mq b{color:var(--g);font-weight:500}
 @keyframes mq{to{transform:translateX(-50%)}}
-/* studio */
+/* ======== 5. STUDIO : choix de catégorie + zone d’écriture + boutons ======== */
 section{padding:110px 0}
 .hd{font-size:clamp(34px,5.5vw,68px);max-width:16ch}
 .sub{color:var(--mu);max-width:48ch;margin:16px 0 0}
@@ -73,7 +95,7 @@ textarea::placeholder{color:#4A5A4F}
 .go:hover{box-shadow:0 0 36px rgba(45,255,138,.5)}.go:disabled{opacity:.6;cursor:wait}
 .prog{height:2px;background:var(--line);margin-top:16px;overflow:hidden;display:none}.prog i{display:block;height:100%;width:0;background:var(--g);box-shadow:0 0 12px var(--g);transition:width .6s}
 .st{color:var(--g);font-size:14px;min-height:22px;margin-top:8px}
-/* result */
+/* ======== 6. RÉSULTAT : la création affichée après génération ======== */
 .res{margin-top:36px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(160deg,var(--p2),var(--p1));padding:clamp(22px,4vw,44px)}
 .tag{display:inline-flex;gap:8px;align-items:center;color:var(--g);font-size:14px;font-weight:600;border:1px solid rgba(45,255,138,.35);border-radius:99px;padding:4px 12px}
 .res h2{font-size:clamp(30px,5vw,56px);margin:16px 0 8px}
@@ -81,13 +103,13 @@ textarea::placeholder{color:#4A5A4F}
 .sec h3{font-size:18px;color:var(--g)}.sec p{margin:0;color:#B9C7BD;max-width:64ch}
 @keyframes fi{from{opacity:0;transform:translateY(8px)}}
 .demo{color:var(--mu);font-size:13px;margin-top:22px}
-/* steps */
+/* ======== 7. SECTION « TROIS GESTES » et pied de page ======== */
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:48px;border-top:1px solid var(--line)}
 .step{padding:28px 28px 0 0}.step+.step{padding-left:28px;border-left:1px solid var(--line)}
 .step b{font:700 15px Syne,sans-serif;color:var(--g)}.step h3{font-size:30px;margin:14px 0 10px}.step p{color:var(--mu);margin:0}
 footer{border-top:1px solid var(--line);padding:40px 0 60px;color:var(--mu);font-size:14px}
 footer .row strong{font:800 26px Syne,sans-serif;color:var(--tx);letter-spacing:-.04em}
-/* profile */
+/* ======== 8. PAGE PROFIL : mes projets, onglets, cartes ======== */
 .pro{padding:150px 0 100px;min-height:100svh}
 .ph{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
 .av{width:84px;height:84px;border-radius:50%;background:var(--g);color:var(--on);display:grid;place-items:center;font:800 38px Syne,sans-serif;box-shadow:0 0 50px rgba(45,255,138,.35)}
@@ -104,6 +126,7 @@ footer .row strong{font:800 26px Syne,sans-serif;color:var(--tx);letter-spacing:
 .vis[aria-pressed="true"]{border-color:rgba(45,255,138,.5);color:var(--g)}.vis[aria-pressed="true"] i{background:var(--g)}.vis[aria-pressed="true"] i::after{transform:translateX(12px);background:var(--on)}
 .mini{background:none;border:0;color:var(--mu);padding:6px 8px;font-size:14px}.mini:hover{color:var(--g)}
 .empty{border:1px dashed var(--line);border-radius:20px;padding:60px 20px;text-align:center;color:var(--mu)}
+/* ======== 9. FENÊTRES (connexion, fiche d’une création) et message de confirmation ======== */
 dialog{border:1px solid var(--line);border-radius:26px;background:var(--p1);color:var(--tx);padding:30px;width:min(440px,92vw);max-height:90vh}
 dialog#vd{width:min(760px,94vw)}
 dialog::backdrop{background:rgba(2,4,3,.8);backdrop-filter:blur(6px)}
@@ -112,9 +135,14 @@ label.f{display:block;font-weight:500;font-size:14px;color:var(--mu);margin:16px
 input{width:100%;padding:13px 16px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--tx);font:inherit}input:focus{border-color:var(--g);outline:0}
 .err{color:#FF6B6B;font-size:14px;min-height:20px;margin-top:8px}
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,24px);background:var(--g);color:var(--on);padding:11px 20px;border-radius:99px;font-weight:600;opacity:0;transition:.3s;z-index:90;pointer-events:none}.toast.on{opacity:1;transform:translate(-50%,0)}
+/* ======== 11. ADAPTATION AU TÉLÉPHONE ET À LA TABLETTE ======== */
 @media (max-width:860px){.studio{grid-template-columns:1fr}.box{position:static}.steps{grid-template-columns:1fr}.step,.step+.step{padding:24px 0;border-left:0;border-bottom:1px solid var(--line)}.sec{grid-template-columns:1fr;gap:6px}section{padding:80px 0}.lk{padding:9px 10px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.big span{transform:none}}
 
+/* ======== 9b. BOUTON CROIX (✕) pour fermer les fenêtres ======== */
+.x{position:absolute;top:14px;right:14px;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--p2);color:var(--tx);font-size:16px;line-height:1;display:grid;place-items:center;z-index:3;transition:border-color .2s,color .2s}
+.x:hover{border-color:var(--g);color:var(--g)}
+/* ======== 10. EXPLORER : bannière, affiches façon Netflix, recherche, créateurs ======== */
 .btn.sm{padding:7px 16px;font-size:14px}
 .bbd{position:relative;margin-top:40px;border-radius:28px;overflow:hidden;min-height:400px;display:flex;align-items:flex-end;padding:clamp(22px,4vw,48px);background:radial-gradient(600px circle at 80% 15%,hsl(var(--h) 90% 38%/.55),transparent 60%),linear-gradient(160deg,hsl(var(--h) 70% 16%),#040705);border:1px solid var(--line)}
 .bbd h2{font-size:clamp(36px,6vw,78px);margin:14px 0 10px;max-width:14ch}.bbd p{color:#B9C7BD;max-width:50ch;margin:0 0 20px}
@@ -135,6 +163,8 @@ input{width:100%;padding:13px 16px;border-radius:12px;border:1px solid var(--lin
 </style>
 </head>
 <body>
+<!-- ################ PARTIE 2 : STRUCTURE (HTML) ################ -->
+<!-- Barre de navigation fixe en haut : logo, Studio, Ma liste, Profil, Connexion -->
 <nav aria-label="Navigation principale">
 <button class="logo" data-go="home" aria-label="auraii, accueil">auraii<i></i></button>
 <button class="lk" data-go="studio" id="n-studio">Studio</button>
@@ -142,19 +172,27 @@ input{width:100%;padding:13px 16px;border-radius:12px;border:1px solid var(--lin
 <button class="lk" data-go="profile" id="n-profile">Profil</button>
 <span id="auth"></span>
 </nav>
+<!-- Zone principale : le JavaScript y affiche l’accueil, le profil ou Ma liste -->
 <div id="app"></div>
 
-<dialog id="ad"><h2 id="at">Connexion</h2><div class="hint" id="as">Retrouvez tous vos projets.</div>
+<!-- FENÊTRE DE CONNEXION / CRÉATION DE COMPTE (bouton ✕ pour fermer) -->
+<dialog id="ad"><button type="button" class="x" id="ax" aria-label="Fermer">✕</button><h2 id="at">Connexion</h2><div class="hint" id="as">Retrouvez tous vos projets.</div>
 <form id="af"><div id="nw" hidden><label class="f" for="an">Nom affiché</label><input id="an" autocomplete="name"></div>
 <label class="f" for="am">E-mail</label><input id="am" type="email" required autocomplete="email">
 <label class="f" for="ap">Mot de passe</label><input id="ap" type="password" required minlength="6">
 <div class="err" id="ae" role="alert"></div>
 <div class="row" style="margin-top:10px"><button type="button" class="mini" id="asw">Créer un compte</button><button class="btn" id="asb">Se connecter</button></div></form></dialog>
-<dialog id="vd"><div id="vb"></div><div class="row" style="margin-top:22px"><span></span><button class="btn ghost" id="vc">Fermer</button></div></dialog>
+<!-- FENÊTRE DE FICHE : détail d’une création ou profil d’un créateur -->
+<dialog id="vd"><button type="button" class="x" id="vx" aria-label="Fermer">✕</button><div id="vb"></div><div class="row" style="margin-top:22px"><span></span><button class="btn ghost" id="vc">Fermer</button></div></dialog>
+<!-- Petit message temporaire en bas de l’écran (ex. « Lien copié ») -->
 <div class="toast" id="toast" role="status"></div>
 
 <script>
+// ################ PARTIE 3 : COMPORTEMENT (JavaScript) ################
 (function(){
+// ============================================================
+// 1. LES CATÉGORIES (nom, description, exemples d’idées). Ajoutez-en ici.
+// ============================================================
 var CATS={
 film:{n:"Film",d:"Scénario et plan",out:"Scénario et plan de film",ph:"Un thriller dans une station spatiale où l’équipage revit la même journée…",ex:["Un huis clos sous-marin","Une comédie romantique à Lisbonne"]},
 musique:{n:"Musique",d:"Morceau et paroles",out:"Structure et paroles du morceau",ph:"Une chanson électro mélancolique sur le dernier train de nuit…",ex:["Une ballade folk au lever du jour","Un titre techno pour courir"]},
@@ -163,17 +201,30 @@ livre:{n:"Livre",d:"Plan et chapitres",out:"Plan et chapitres du livre",ph:"Un r
 education:{n:"Éducation",d:"Parcours pédagogique",out:"Parcours pédagogique",ph:"Un cours de 4 semaines pour initier des collégiens à l’astronomie…",ex:["Apprendre Python en 30 jours","Atelier d’écriture pour adultes"]}
 };
 var TONES=["Sobre","Épique","Poétique","Drôle"];
+// ============================================================
+// 2. STOCKAGE : sauvegarde dans le navigateur (comptes, projets, likes)
+// ============================================================
 var mem={};
+// Lit ou écrit une valeur dans la mémoire du navigateur
 function ls(k,v){try{if(v===undefined){var r=localStorage.getItem(k);return r===null?mem[k]:r}localStorage.setItem(k,v)}catch(e){if(v===undefined)return mem[k];mem[k]=v}}
+// Lit une valeur JSON (avec une valeur par défaut)
 function jget(k,d){try{var r=ls(k);return r?JSON.parse(r):d}catch(e){return d}}
+// Protège le texte saisi (sécurité)
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 var $=function(s){return document.querySelector(s)},$$=function(s){return document.querySelectorAll(s)};
 var user=jget("fab_session",null),cat="film",tone="Sobre",pending=false,filter="all",busy=false,draft="",q="",fc="all";
+// Renvoie les projets de l’utilisateur connecté
 function projects(){return user?jget("aur_p_"+user.email,[]):[]}
+// Enregistre les projets de l’utilisateur
 function save(p){ls("aur_p_"+user.email,JSON.stringify(p))}
+// Affiche un petit message temporaire
 function toast(t){var e=$("#toast");e.textContent=t;e.classList.add("on");clearTimeout(toast.t);toast.t=setTimeout(function(){e.classList.remove("on")},2200)}
 
+// ============================================================
+// 3. GÉNÉRATION IA (SIMULÉE) : à remplacer par un vrai appel à votre IA
+// ============================================================
 /* Génération simulée : à brancher sur votre modèle IA */
+// Fabrique la création (SIMULÉE) à partir de la description
 function gen(k,p,t){
  var w=p.trim().split(/\s+/),ti=w.slice(0,6).join(" ").replace(/[.,;:!?…]+$/,"");ti=ti.charAt(0).toUpperCase()+ti.slice(1);
  var s=p.length>150?p.slice(0,150)+"…":p,T=" Ton "+t.toLowerCase()+".";
@@ -185,9 +236,14 @@ function gen(k,p,t){
  education:[["Objectif","Un parcours pour répondre à : "+s+T],["Prérequis","Aucun : chaque notion part d’un exemple du quotidien."],["Modules","Découvrir, comprendre, pratiquer, évaluer, chacun avec activité et quiz."],["Évaluation","Un mini-projet final et un quiz de dix questions."]]};
  return{title:ti,sections:S[k].map(function(x){return{h:x[0],p:x[1]}})};
 }
+// Dessine le résultat d’une création
 function resHTML(p,stream){return'<div class="res"><span class="tag">'+CATS[p.cat].out+' · ton '+esc((p.tone||"sobre").toLowerCase())+'</span><h2>'+esc(p.title)+'</h2>'+p.sections.map(function(s,i){return'<div class="sec" style="animation-delay:'+(stream?i*350+200:0)+'ms"><h3>'+esc(s.h)+'</h3><p>'+esc(s.p)+'</p></div>'}).join("")+'<div class="demo">Aperçu de démonstration : la génération réelle sera reliée à votre modèle IA.</div></div>'}
 
+// ============================================================
+// 4. PAGE D’ACCUEIL ET STUDIO : home() dessine toute la page
+// ============================================================
 /* Accueil + studio */
+// Dessine la page d’accueil complète
 function home(){
  var C=CATS[cat],all=[];Object.keys(CATS).forEach(function(k){all=all.concat([CATS[k].ph])});
  var mq=all.concat(all).map(function(x){return'<span><b>◆</b> '+esc(x)+'</span>'}).join("");
@@ -212,47 +268,51 @@ function home(){
  var h=$("#top");h.onpointermove=function(e){var r=h.getBoundingClientRect();h.style.setProperty("--mx",(e.clientX-r.left)+"px");h.style.setProperty("--my",(e.clientY-r.top)+"px")};
 }
 
+// ============================================================
+// 5. EXPLORER ET RÉSEAU : mots interdits, affiches, likes, ma liste, créateurs
+// ============================================================
 var BAD=/(^|[^a-zà-ÿ])(sexe|porno|porn|nu|nue|nus|sang|gore|meurtre|tuer|viol|drogue|drogues|arme|armes|haine|suicide|massacre|cadavre|érotique|erotique|torture)([^a-zà-ÿ]|$)/i;
 var PL={film:"Films",musique:"Musiques",jeux:"Jeux",livre:"Livres",education:"Éducation"};
-var SEED=[["s1","film","Le Dernier Train de Lune","Léa M.","Une aventure animée où deux enfants prennent un train magique qui voyage entre les étoiles.",1240],
-["s2","musique","Berceuse des Vagues","Camille","Une berceuse douce au piano et aux sons de l’océan pour s’endormir.",980],
-["s3","jeux","Jardin Cosy","Inès","Un jeu paisible où l’on fait pousser un jardin et accueillir des animaux.",870],
-["s4","livre","La Bibliothèque aux Mille Portes","Sofia","Un roman jeunesse sur une bibliothèque dont chaque porte ouvre sur un monde.",760],
-["s5","education","Les Planètes en 4 Semaines","Mme Roche","Un cours ludique pour découvrir le système solaire avec des expériences simples.",690],
-["s6","film","Pirates de la Mer de Lait","Zoé","Une comédie de pirates gourmands qui cherchent le trésor du gâteau géant.",640],
-["s7","jeux","Capitaine Bulle","Yanis","Un jeu d’exploration sous-marine où l’on aide les poissons à retrouver leur maison.",610],
-["s8","musique","Dans la Forêt qui Chante","Tom","Une chanson joyeuse à reprendre en chœur, avec les cris des animaux de la forêt.",560],
-["s9","livre","Le Renard Cartographe","Hugo","Un conte illustré sur un renard qui dessine la carte d’un monde imaginaire.",510],
-["s10","education","Apprendre à coder en jouant","Karim","Un parcours de 30 jours pour créer ses premiers jeux avec des blocs colorés.",480],
-["s11","film","Les Gardiens du Potager","Noé","Un film d’animation où des légumes veillent sur le potager pendant la nuit.",450],
-["s12","jeux","Les Dragons Pâtissiers","Léo","Un jeu de gestion où de gentils dragons ouvrent une pâtisserie de fête.",430]];
+var SEED=[]; // Liste d'exemples volontairement vide : seuls les projets publics des vrais utilisateurs apparaissent
+
+// Choisit une teinte de vert pour chaque affiche
 function hue(id){var h=0;for(var i=0;i<id.length;i++)h=(h*31+id.charCodeAt(i))%50;return 135+h}
 function hv(){return location.hash.replace("#","")}
+// Liste toutes les créations PUBLIQUES (communauté)
 function comm(){
  var a=SEED.map(function(x){return{id:x[0],cat:x[1],title:x[2],author:x[3],prompt:x[4],likes:x[5],tone:"Poétique"}});
  try{var U=jget("fab_users",{});for(var i=0;i<localStorage.length;i++){var k=localStorage.key(i);if(k.indexOf("aur_p_")===0){var u=U[k.slice(6)];jget(k,[]).forEach(function(p){if(p.public)a.push({id:p.id,cat:p.cat,title:p.title,author:u?u.name:"Créateur",prompt:p.prompt,likes:0,tone:p.tone,sections:p.sections})})}}}catch(e){}
  return a}
+// Lit les likes, la liste et les abonnements de l’utilisateur
 function soc(){return user?jget("aur_s_"+user.email,{likes:[],list:[],follows:[]}):{likes:[],list:[],follows:[]}}
+// Demande de se connecter si ce n’est pas fait
 function need(){if(user)return true;openAuth("login");return false}
+// Ajoute/retire un like, un élément de la liste ou un abonnement
 function toggle(k,id){if(!need())return;var s=soc();["likes","list","follows"].forEach(function(x){s[x]=s[x]||[]});var i=s[k].indexOf(id);if(i>-1)s[k].splice(i,1);else s[k].push(id);ls("aur_s_"+user.email,JSON.stringify(s))}
 function nl(p){return p.likes+(soc().likes.indexOf(p.id)>-1?1:0)}
+// Dessine une affiche de création
 function poster(p){return'<button class="poster" data-p="'+esc(p.id)+'" style="--h:'+hue(p.id)+'"><span class="pc">'+CATS[p.cat].n+'</span><b>'+esc(p.title)+'</b><small>'+esc(p.author)+' · ♥ '+nl(p)+'</small></button>'}
+// Dessine une rangée d’affiches
 function row(t,a){return a.length?'<h3 class="rt">'+t+'</h3><div class="rail">'+a.map(poster).join("")+'</div>':""}
+// Dessine toutes les rangées (Tendances, Nouveautés, catégories…)
 function rows(){
  var L=comm().filter(function(p){var t=(p.title+" "+p.author+" "+p.prompt).toLowerCase();return(fc==="all"||p.cat===fc)&&(!q||t.indexOf(q.toLowerCase())>-1)});
- if(!L.length)return'<div class="empty" style="margin-top:30px">Aucun résultat. Essayez un autre mot.</div>';
+ if(!L.length)return'<div class="empty" style="margin-top:30px">'+(q||fc!=="all"?"Aucun résultat. Essayez un autre mot.":"Aucune création publique pour l’instant. Créez la vôtre dans le Studio et publiez-la ici !")+'</div>';
  if(q)return'<div class="sgrid">'+L.map(poster).join("")+'</div>';
  var h=row("Tendances",L.slice().sort(function(a,b){return nl(b)-nl(a)}).slice(0,10))+row("Nouveautés",L.slice().reverse().slice(0,10));
  if(fc==="all"){Object.keys(CATS).forEach(function(k){h+=row(PL[k],L.filter(function(p){return p.cat===k}))});
   var au=[];L.forEach(function(p){if(au.indexOf(p.author)<0)au.push(p.author)});var F=soc().follows||[];
   h+='<h3 class="rt">Créateurs à suivre</h3><div class="crs">'+au.map(function(n){var f=F.indexOf(n)>-1;return'<div class="cr"><button class="av" data-cr="'+esc(n)+'" aria-label="Voir '+esc(n)+'">'+esc(n.charAt(0).toUpperCase())+'</button><b>'+esc(n)+'</b><button class="btn sm'+(f?" ghost":"")+'" data-fo="'+esc(n)+'">'+(f?"Suivi ✓":"Suivre")+'</button></div>'}).join("")+'</div>'}
  return h}
+// Rafraîchit la zone Explorer
 function refreshExp(){var e=$("#exr");if(e)e.innerHTML=rows()}
+// Dessine la section Explorer (bannière, recherche, rangées)
 function explore(){
  var f=comm()[0];
  return'<section id="explore" style="padding-bottom:20px"><div class="wrap"><h2 class="hd">À l’affiche chez auraii</h2><p class="sub">Les créations de la communauté, pour toute la famille. Likez, ajoutez à votre liste, remixez.</p>'+
- '<div class="bbd" style="--h:'+hue(f.id)+'"><div><span class="tag">'+CATS[f.cat].out+' · Tout public</span><h2>'+esc(f.title)+'</h2><p>'+esc(f.prompt)+'</p><div class="acts"><button class="btn" data-p="'+f.id+'">Découvrir</button><button class="btn ghost" data-rm="'+f.id+'">Remixer</button></div></div></div>'+
+ (f?'<div class="bbd" style="--h:'+hue(f.id)+'"><div><span class="tag">'+CATS[f.cat].out+' · Tout public</span><h2>'+esc(f.title)+'</h2><p>'+esc(f.prompt)+'</p><div class="acts"><button class="btn" data-p="'+f.id+'">Découvrir</button><button class="btn ghost" data-rm="'+f.id+'">Remixer</button></div></div></div>':'')+
  '<div class="srch"><input id="q" type="search" placeholder="Rechercher un titre, un créateur…" aria-label="Rechercher" value="'+esc(q)+'">'+[["all","Tout"]].concat(Object.keys(CATS).map(function(k){return[k,PL[k]]})).map(function(c){return'<button class="chip" data-fc="'+c[0]+'" aria-pressed="'+(fc===c[0])+'">'+c[1]+'</button>'}).join("")+'</div><div id="exr">'+rows()+'</div></div></section>'}
+// Ouvre la fiche d’une création
 function detail(id){
  var p=comm().filter(function(x){return x.id===id})[0];if(!p)return;var s=soc(),a=(s.likes||[]).indexOf(id)>-1,b=(s.list||[]).indexOf(id)>-1,secs=p.sections||gen(p.cat,p.prompt,p.tone||"Poétique").sections;
  $("#vb").innerHTML='<div class="bbd" style="--h:'+hue(id)+';min-height:240px;margin:0"><div><span class="tag">'+CATS[p.cat].out+' · Tout public</span><h2 style="font-size:clamp(30px,5vw,52px)">'+esc(p.title)+'</h2><p>par <button class="mini" style="padding:0;color:var(--g)" data-cr="'+esc(p.author)+'">'+esc(p.author)+'</button> · '+nl(p)+' j’aime</p><div class="acts"><button class="btn" id="d1">'+(a?"♥ Aimé":"♡ J’aime")+'</button><button class="btn ghost" id="d2">'+(b?"✓ Dans ma liste":"+ Ma liste")+'</button><button class="btn ghost" id="d3">Remixer</button><button class="btn ghost" id="d4">Partager</button></div></div></div>'+secs.map(function(x){return'<div class="sec"><h3>'+esc(x.h)+'</h3><p>'+esc(x.p)+'</p></div>'}).join("");
@@ -261,15 +321,21 @@ function detail(id){
  $("#d3").onclick=function(){remix(p)};
  $("#d4").onclick=function(){try{navigator.clipboard.writeText(location.href.split("#")[0])}catch(e){}toast("Lien copié")};
  if(!$("#vd").open)$("#vd").showModal()}
+// Ouvre le profil public d’un créateur
 function cr(n){
  var f=(soc().follows||[]).indexOf(n)>-1,L=comm().filter(function(p){return p.author===n});
  $("#vb").innerHTML='<div id="crd" class="ph"><div class="av">'+esc(n.charAt(0).toUpperCase())+'</div><div><h2 style="font-size:36px;margin:0">'+esc(n)+'</h2><div class="hint" style="margin:6px 0 12px">'+L.length+' création'+(L.length>1?"s":"")+' publique'+(L.length>1?"s":"")+'</div><button class="btn'+(f?" ghost":"")+' sm" data-fo="'+esc(n)+'">'+(f?"Suivi ✓":"Suivre")+'</button></div></div><div class="sgrid">'+L.map(poster).join("")+'</div>';
  if(!$("#vd").open)$("#vd").showModal()}
+// Reprend la description d’une création dans le Studio
 function remix(p){cat=p.cat;draft=p.prompt;$("#vd").close();var h=hv();if(h==="profile"||h==="list")location.hash="home";else home();setTimeout(function(){sc("studio")},150)}
+// Dessine la page « Ma liste »
 function listView(){
  if(!user){openAuth("login");location.hash="home";return}
  var ids=soc().list||[],L=comm().filter(function(p){return ids.indexOf(p.id)>-1});
  $("#app").innerHTML='<div class="pro"><div class="wrap"><h1 class="hd" style="max-width:none">Ma liste</h1><p class="sub">Vos coups de cœur à (re)découvrir.</p>'+(L.length?'<div class="sgrid">'+L.map(poster).join("")+'</div>':'<div class="empty" style="margin-top:30px">Votre liste est vide. Ajoutez des créations depuis Explorer.<br><br><button class="btn" data-go="home">Explorer</button></div>')+'</div></div>';bind()}
+// ============================================================
+// 10. ÉVÉNEMENTS GÉNÉRAUX : clics sur affiches, filtres, suivre, recherche
+// ============================================================
 document.addEventListener("click",function(e){
  var t=e.target.closest("[data-p],[data-fc],[data-fo],[data-cr],[data-rm]");if(!t)return;var d=t.dataset;
  if(d.p)detail(d.p);
@@ -278,6 +344,9 @@ document.addEventListener("click",function(e){
  else if(d.cr)cr(d.cr);
  else if(d.rm)remix(comm().filter(function(x){return x.id===d.rm})[0])});
 document.addEventListener("input",function(e){if(e.target.id==="q"){q=e.target.value;refreshExp()}});
+// ============================================================
+// 6. CRÉER UN PROJET : start() lance la génération et l’enregistre
+// ============================================================
 function start(){
  if(busy)return;var v=($("#pr").value||"").trim();
  if(v.length<10){$("#st").textContent="Ajoutez quelques mots de plus (10 caractères minimum).";return}
@@ -293,6 +362,10 @@ function start(){
   bind();$("#pubn").onclick=function(){var x=projects();x.forEach(function(r){if(r.id===p.id)r.public=true});save(x);this.disabled=true;this.textContent="Publié";refreshExp();toast("Publié dans Explorer")};$("#out").scrollIntoView({behavior:"smooth",block:"start"});
  },2500);
 }
+// ============================================================
+// 7. PAGE PROFIL : liste des projets, public/privé, suppression
+// ============================================================
+// Dessine la page Profil
 function profile(){
  if(!user){openAuth("login");location.hash="home";return}
  var a=projects(),pub=a.filter(function(p){return p.public}).length,l=a.filter(function(p){return filter==="all"||(filter==="public")===p.public});
@@ -305,24 +378,35 @@ function profile(){
  $$("[data-open]").forEach(function(b){b.onclick=function(){var p=projects().filter(function(x){return x.id===b.dataset.open})[0];$("#vb").innerHTML=resHTML(p,false);$("#vd").showModal()}});
  bind();
 }
+// ============================================================
+// 8. NAVIGATION : menu, changement de page (route)
+// ============================================================
 function bind(){$$("[data-go]").forEach(function(b){b.onclick=function(){go(b.dataset.go)}})}
+// Défile vers une section ou change de page
 function go(t){
  if(t==="profile"||t==="list"){location.hash=t;return}
  var cur=location.hash.replace("#","");
  if(cur==="profile"||cur==="list"){location.hash="home";setTimeout(function(){sc(t)},60)}else sc(t);
 }
 function sc(t){var e=t==="home"?$("#top"):$("#"+t);if(e)e.scrollIntoView({behavior:"smooth",block:"start"})}
+// Affiche le bouton Connexion ou Déconnexion
 function nav(){
  $("#auth").innerHTML=user?'<button class="btn ghost" id="lo">Déconnexion</button>':'<button class="btn" id="li">Connexion</button>';
  if($("#lo"))$("#lo").onclick=function(){user=null;ls("fab_session","");toast("Vous êtes déconnecté");nav();location.hash="home";route()};
  if($("#li"))$("#li").onclick=function(){openAuth("login")};
 }
+// Affiche la bonne page selon l’adresse (#profile, #list…)
 function route(){
  var h=hv();$("#n-profile").setAttribute("aria-current",h==="profile"?"page":"false");$("#n-list").setAttribute("aria-current",h==="list"?"page":"false");
  if(h==="profile")profile();else if(h==="list")listView();else home();
  bind();scrollTo(0,0)}
+// ============================================================
+// 9. CONNEXION / INSCRIPTION (démo locale, sans serveur)
+// ============================================================
 var mode="login";
+// Ouvre la fenêtre de connexion
 function openAuth(m){mode=m;aui();$("#ae").textContent="";$("#ad").showModal()}
+// Adapte le texte de la fenêtre (connexion ou inscription)
 function aui(){var s=mode==="signup";$("#at").textContent=s?"Rejoignez auraii":"Connexion";$("#as").textContent=s?"Gratuit. Vos projets restent privés par défaut.":"Retrouvez tous vos projets.";$("#nw").hidden=!s;$("#asb").textContent=s?"Créer mon compte":"Se connecter";$("#asw").textContent=s?"J’ai déjà un compte":"Créer un compte"}
 $("#asw").onclick=function(){mode=mode==="login"?"signup":"login";aui();$("#ae").textContent=""};
 $("#af").onsubmit=function(e){
@@ -333,6 +417,10 @@ $("#af").onsubmit=function(e){
  var h=location.hash.replace("#","");if(h==="profile")profile();else if(h==="list")listView();else if($("#exr"))refreshExp();if(pending){pending=false;setTimeout(start,100)}
 };
 $("#vc").onclick=function(){$("#vd").close()};
+$("#vx").onclick=function(){$("#vd").close()};
+$("#ax").onclick=function(){$("#ad").close()};
+["ad","vd"].forEach(function(id){var d=$("#"+id);d.addEventListener("click",function(e){var r=d.getBoundingClientRect();if(e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom)d.close()})});
+$("#ad").addEventListener("close",function(){pending=false});
 window.addEventListener("hashchange",route);
 nav();route();
 })();
