@@ -8,6 +8,7 @@
   PARTIE 1  (style)   : l’APPARENCE (couleurs, tailles, animations)
   PARTIE 2  (body)     : la STRUCTURE (menu, fenêtres, zone principale)
   PARTIE 3  (script)  : le COMPORTEMENT (clics, comptes, projets, likes)
+  PARTIE 4  (module)  : FIREBASE, la connexion des comptes clients (tout en bas)
 
   Chaque partie est découpée en blocs numérotés avec un bandeau
   « ===== TITRE ===== ». Utilisez la recherche (Ctrl+F) sur un titre.
@@ -16,6 +17,7 @@
    - une couleur .................. PARTIE 1, bloc 1
    - le texte de l’accueil ........ PARTIE 3, fonction home()
    - les catégories ............... PARTIE 3, bloc 1 (CATS)
+   - la configuration Firebase .... PARTIE 4 (tout en bas du fichier)
    - la liste de mots interdits ... PARTIE 3, bloc EXPLORER (BAD)
 ==================================================================
 -->
@@ -213,6 +215,7 @@ function jget(k,d){try{var r=ls(k);return r?JSON.parse(r):d}catch(e){return d}}
 function esc(s){return String(s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 var $=function(s){return document.querySelector(s)},$$=function(s){return document.querySelectorAll(s)};
 var user=jget("fab_session",null),cat="film",tone="Sobre",pending=false,filter="all",busy=false,draft="",q="",fc="all";
+if(user&&!user.uid)user=null; // ancienne session de démonstration (sans Firebase) : ignorée
 // Renvoie les projets de l’utilisateur connecté
 function projects(){return user?jget("aur_p_"+user.email,[]):[]}
 // Enregistre les projets de l’utilisateur
@@ -392,7 +395,7 @@ function sc(t){var e=t==="home"?$("#top"):$("#"+t);if(e)e.scrollIntoView({behavi
 // Affiche le bouton Connexion ou Déconnexion
 function nav(){
  $("#auth").innerHTML=user?'<button class="btn ghost" id="lo">Déconnexion</button>':'<button class="btn" id="li">Connexion</button>';
- if($("#lo"))$("#lo").onclick=function(){user=null;ls("fab_session","");toast("Vous êtes déconnecté");nav();location.hash="home";route()};
+ if($("#lo"))$("#lo").onclick=function(){user=null;ls("fab_session","");if(window.fb)window.fb.logout().catch(function(e){console.error(e)});toast("Vous êtes déconnecté");nav();location.hash="home";route()};
  if($("#li"))$("#li").onclick=function(){openAuth("login")};
 }
 // Affiche la bonne page selon l’adresse (#profile, #list…)
@@ -401,7 +404,7 @@ function route(){
  if(h==="profile")profile();else if(h==="list")listView();else home();
  bind();scrollTo(0,0)}
 // ============================================================
-// 9. CONNEXION / INSCRIPTION (démo locale, sans serveur)
+// 9. CONNEXION / INSCRIPTION (via Firebase Authentication, voir PARTIE 4)
 // ============================================================
 var mode="login";
 // Ouvre la fenêtre de connexion
@@ -409,13 +412,30 @@ function openAuth(m){mode=m;aui();$("#ae").textContent="";$("#ad").showModal()}
 // Adapte le texte de la fenêtre (connexion ou inscription)
 function aui(){var s=mode==="signup";$("#at").textContent=s?"Rejoignez auraii":"Connexion";$("#as").textContent=s?"Gratuit. Vos projets restent privés par défaut.":"Retrouvez tous vos projets.";$("#nw").hidden=!s;$("#asb").textContent=s?"Créer mon compte":"Se connecter";$("#asw").textContent=s?"J’ai déjà un compte":"Créer un compte"}
 $("#asw").onclick=function(){mode=mode==="login"?"signup":"login";aui();$("#ae").textContent=""};
-$("#af").onsubmit=function(e){
- e.preventDefault();var m=$("#am").value.trim().toLowerCase(),pw=$("#ap").value,u=jget("fab_users",{});
- if(mode==="signup"){if(u[m]){$("#ae").textContent="Un compte existe déjà avec cet e-mail.";return}u[m]={name:$("#an").value.trim()||m.split("@")[0],pw:pw};ls("fab_users",JSON.stringify(u))}
- else if(!u[m]||u[m].pw!==pw){$("#ae").textContent="E-mail ou mot de passe incorrect.";return}
- user={email:m,name:u[m].name};ls("fab_session",JSON.stringify(user));$("#ad").close();nav();toast("Bienvenue, "+user.name);
- var h=location.hash.replace("#","");if(h==="profile")profile();else if(h==="list")listView();else if($("#exr"))refreshExp();if(pending){pending=false;setTimeout(start,100)}
-};
+// Traduit un code d’erreur Firebase en message français
+function fbMsg(c){var M={"auth/email-already-in-use":"Un compte existe déjà avec cet e-mail.","auth/invalid-credential":"E-mail ou mot de passe incorrect.","auth/wrong-password":"E-mail ou mot de passe incorrect.","auth/user-not-found":"E-mail ou mot de passe incorrect.","auth/invalid-login-credentials":"E-mail ou mot de passe incorrect.","auth/invalid-email":"Adresse e-mail invalide.","auth/weak-password":"Mot de passe trop faible (6 caractères minimum).","auth/too-many-requests":"Trop de tentatives. Réessayez dans quelques minutes.","auth/network-request-failed":"Problème de connexion internet. Réessayez.","auth/operation-not-allowed":"La connexion par e-mail n’est pas activée dans Firebase.","auth/unauthorized-domain":"Ce site n’est pas autorisé dans Firebase (domaines autorisés)."};return M[c]||"Une erreur est survenue. Réessayez."}
+// Mémorise le compte connecté (session + nom affiché sur les projets publics)
+function remember(u){user=u;ls("fab_session",JSON.stringify(u));var U=jget("fab_users",{});U[u.email]={name:u.name};ls("fab_users",JSON.stringify(U))}
+// Rafraîchit la page affichée après un changement de compte
+function refreshView(){var h=hv();if(h==="profile")profile();else if(h==="list")listView();else if($("#exr"))refreshExp()}
+// Appelée par Firebase (PARTIE 4) quand l’état de connexion change (ouverture du site, autre onglet, déconnexion)
+window.auraiiSetUser=function(u){
+ if(u){if(user&&user.uid===u.uid)return;remember(u)}
+ else{if(!user)return;user=null;ls("fab_session","")}
+ nav();refreshView()};
+// Formulaire de connexion / création de compte
+$("#af").onsubmit=async function(e){
+ e.preventDefault();
+ var m=$("#am").value.trim().toLowerCase(),pw=$("#ap").value,btn=$("#asb");
+ if(!window.fb){$("#ae").textContent="Le service de connexion n’est pas prêt. Vérifiez votre connexion internet puis réessayez.";return}
+ $("#ae").textContent="";btn.disabled=true;
+ try{
+  var u=mode==="signup"?await window.fb.signup(m,pw,$("#an").value.trim()):await window.fb.login(m,pw);
+  remember(u);$("#ad").close();nav();toast("Bienvenue, "+user.name);
+  refreshView();if(pending){pending=false;setTimeout(start,100)}
+  $("#af").reset();
+ }catch(err){console.error(err);$("#ae").textContent=fbMsg(err&&err.code)}
+ btn.disabled=false};
 $("#vc").onclick=function(){$("#vd").close()};
 $("#vx").onclick=function(){$("#vd").close()};
 $("#ax").onclick=function(){$("#ad").close()};
@@ -424,6 +444,52 @@ $("#ad").addEventListener("close",function(){pending=false});
 window.addEventListener("hashchange",route);
 nav();route();
 })();
+</script>
+<!-- ################ PARTIE 4 : FIREBASE (comptes clients) ################
+  Ce bloc relie le site à Firebase Authentication (e-mail + mot de passe).
+  Il crée « window.fb » (inscription, connexion, déconnexion) utilisé par la
+  PARTIE 3, et prévient le site quand quelqu’un se connecte ou se déconnecte.
+  Pour changer de projet Firebase, modifiez uniquement firebaseConfig.
+-->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-auth.js";
+
+  // Configuration de votre projet Firebase (fournie par la console Firebase)
+  const firebaseConfig = {
+    apiKey: "AIzaSyDpH346anacsLeQcrYPZT81BZLo8tFLh84",
+    authDomain: "auraii-web.firebaseapp.com",
+    projectId: "auraii-web",
+    storageBucket: "auraii-web.firebasestorage.app",
+    messagingSenderId: "504710933038",
+    appId: "1:504710933038:web:69849a8022532cb4504dbf"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // Transforme un utilisateur Firebase en objet simple utilisé par le site
+  const simple = (u, fallbackEmail) => {
+    const email = (u.email || fallbackEmail || "").toLowerCase();
+    return { uid: u.uid, email: email, name: u.displayName || email.split("@")[0] };
+  };
+
+  // Fonctions utilisées par la PARTIE 3 (formulaire de connexion, bouton Déconnexion)
+  window.fb = {
+    signup: async (email, pw, name) => {
+      const c = await createUserWithEmailAndPassword(auth, email, pw);
+      const n = name || email.split("@")[0];
+      try { await updateProfile(c.user, { displayName: n }); } catch (e) { console.warn(e); }
+      return { uid: c.user.uid, email: email.toLowerCase(), name: n };
+    },
+    login: async (email, pw) => simple((await signInWithEmailAndPassword(auth, email, pw)).user, email),
+    logout: () => signOut(auth)
+  };
+
+  // Firebase prévient le site à chaque changement (réouverture du site, déconnexion...)
+  onAuthStateChanged(auth, (u) => {
+    if (window.auraiiSetUser) window.auraiiSetUser(u ? simple(u) : null);
+  });
 </script>
 </body>
 </html>
