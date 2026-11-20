@@ -350,20 +350,32 @@ document.addEventListener("input",function(e){if(e.target.id==="q"){q=e.target.v
 // ============================================================
 // 6. CRÉER UN PROJET : start() lance la génération et l’enregistre
 // ============================================================
-function start(){
+async function start(){
  if(busy)return;var v=($("#pr").value||"").trim();
  if(v.length<10){$("#st").textContent="Ajoutez quelques mots de plus (10 caractères minimum).";return}
  if(BAD.test(v)){$("#st").textContent="auraii est un espace tout public. Reformulez votre idée sans contenu violent ou inapproprié.";return}
  if(!user){pending=true;openAuth("login");return}
- busy=true;var go=$("#go"),pg=$("#pg"),bar=pg.firstChild,st=$("#st"),steps=["Analyse de votre idée…","Écriture en cours…","Mise en forme…"];
+ busy=true;var go=$("#go"),pg=$("#pg"),bar=pg.firstChild,st=$("#st");
  go.disabled=true;go.textContent="Création en cours…";pg.style.display="block";$("#out").innerHTML="";
- steps.forEach(function(t,i){setTimeout(function(){st.textContent=t;bar.style.width=(i+1)*30+"%"},i*800)});
- setTimeout(function(){
-  var g=gen(cat,v,tone),p={id:Date.now().toString(36),cat:cat,tone:tone,prompt:v,title:g.title,sections:g.sections,public:false,date:Date.now()};
+ st.textContent="L’IA auraii imagine votre projet…";bar.style.width="60%";
+
+ try{
+  var rep=await fetch("https://auraii-api.onrender.com/creer",{
+   method:"POST",
+   headers:{"Content-Type":"application/json"},
+   body:JSON.stringify({cat:cat,prompt:v,tone:tone})
+  });
+  if(!rep.ok)throw new Error("Erreur serveur");
+  var g=await rep.json();
+  bar.style.width="100%";
+  var p={id:Date.now().toString(36),cat:cat,tone:tone,prompt:v,title:g.title,sections:g.sections,public:false,date:Date.now()};
   var a=projects();a.unshift(p);save(a);draft="";busy=false;home();
   $("#out").innerHTML=resHTML(p,true)+'<div class="row" style="margin-top:16px"><span class="hint">Enregistré dans vos projets (privé).</span><button class="btn" id="pubn">Publier dans Explorer</button><button class="btn ghost" data-go="profile">Voir mes projets</button></div>';
   bind();$("#pubn").onclick=function(){var x=projects();x.forEach(function(r){if(r.id===p.id)r.public=true});save(x);this.disabled=true;this.textContent="Publié";refreshExp();toast("Publié dans Explorer")};$("#out").scrollIntoView({behavior:"smooth",block:"start"});
- },2500);
+ }catch(e){
+  busy=false;go.disabled=false;go.textContent="Créer avec auraii";pg.style.display="none";
+  st.textContent="Impossible de joindre l’IA (le serveur démarre peut-être, réessayez dans 20 secondes).";
+ }
 }
 // ============================================================
 // 7. PAGE PROFIL : liste des projets, public/privé, suppression
