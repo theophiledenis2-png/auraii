@@ -1,0 +1,9 @@
+{
+  "name": "auraii-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Serveur IA d'auraii (relie le site à Groq sans exposer la clé)",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" }
+}
