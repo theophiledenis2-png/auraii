@@ -231,7 +231,7 @@ function toast(t){var e=$("#toast");e.textContent=t;e.classList.add("on");clearT
 // ADRESSE DE VOTRE SERVEUR IA (le service Render « auraii-api », dossier api/).
 // Exemple : "https://auraii-api.onrender.com/generate"
 // Laissez "" pour garder la génération SIMULÉE (utile pour tester le site).
-var API_URL="";
+var API_URL="https://auraii-api.onrender.com/generate";
 // Réveille le serveur IA dès l’ouverture du site (l’offre gratuite de Render s’endort après 15 min)
 if(API_URL){try{fetch(API_URL,{mode:"no-cors"}).catch(function(){})}catch(e){}}
 // Demande une création au serveur IA (ou à la simulation si API_URL est vide)
