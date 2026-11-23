@@ -231,16 +231,22 @@ function toast(t){var e=$("#toast");e.textContent=t;e.classList.add("on");clearT
 // ADRESSE DE VOTRE SERVEUR IA (le service Render « auraii-api », dossier api/).
 // Exemple : "https://auraii-api.onrender.com/generate"
 // Laissez "" pour garder la génération SIMULÉE (utile pour tester le site).
-var API_URL="https://auraii-api.onrender.com/generate";
+var API_URL="";
 // Réveille le serveur IA dès l’ouverture du site (l’offre gratuite de Render s’endort après 15 min)
 if(API_URL){try{fetch(API_URL,{mode:"no-cors"}).catch(function(){})}catch(e){}}
 // Demande une création au serveur IA (ou à la simulation si API_URL est vide)
 async function aiGenerate(k,p,t){
  if(!API_URL)return gen(k,p,t);
+ console.info("[auraii] étape 1 : récupération du jeton de connexion");
  var tok=window.fb&&window.fb.token?await window.fb.token():null;
  if(!tok)throw new Error("Reconnectez-vous pour créer.");
- var r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},body:JSON.stringify({category:k,prompt:p,tone:t})});
- var d=await r.json().catch(function(){return{}});
+ console.info("[auraii] étape 2 : envoi de la demande à "+API_URL);
+ // Si le serveur ne répond pas en 75 secondes, on arrête et on prévient (au lieu d’attendre sans fin)
+ var ctl=new AbortController(),to=setTimeout(function(){ctl.abort()},75000),r,d;
+ try{
+  r=await fetch(API_URL,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok},body:JSON.stringify({category:k,prompt:p,tone:t}),signal:ctl.signal});
+  d=await r.json().catch(function(){return{}});
+ }catch(e){if(e&&e.name==="AbortError")throw new Error("Le serveur met trop de temps à répondre. Réessayez dans un instant.");throw e}finally{clearTimeout(to)}
  if(!r.ok)throw new Error(d.error||"Erreur du serveur ("+r.status+").");
  if(!d.title||!d.sections)throw new Error("Réponse inattendue du serveur.");
  return d}
@@ -374,17 +380,21 @@ function start(){
  if(!user){pending=true;openAuth("login");return}
  busy=true;var go=$("#go"),pg=$("#pg"),bar=pg.firstChild,st=$("#st"),steps=["Analyse de votre idée…","Écriture en cours…","Mise en forme…"];
  go.disabled=true;go.textContent="Création en cours…";pg.style.display="block";$("#out").innerHTML="";
- steps.forEach(function(t,i){setTimeout(function(){st.textContent=t;bar.style.width=(i+1)*30+"%"},i*800)});
- if(API_URL)setTimeout(function(){if(busy)st.textContent="Le serveur se réveille, cela peut prendre jusqu’à une minute…"},7000);
+ var tm=[]; // minuteurs de l’animation : on les arrête dès qu’il y a une erreur, pour ne pas cacher le message
+ st.style.color="";
+ steps.forEach(function(t,i){tm.push(setTimeout(function(){st.textContent=t;bar.style.width=(i+1)*30+"%"},i*800))});
+ if(API_URL)tm.push(setTimeout(function(){if(busy)st.textContent="Le serveur se réveille, cela peut prendre jusqu’à une minute…"},7000));
  var wait=new Promise(function(r){setTimeout(r,2500)});
  Promise.all([aiGenerate(cat,v,tone),wait]).then(function(res){
+  tm.forEach(clearTimeout);
   var g=res[0],p={id:Date.now().toString(36),cat:cat,tone:tone,prompt:v,title:g.title,sections:g.sections,public:false,date:Date.now()};
   var a=projects();a.unshift(p);save(a);draft="";busy=false;home();
   $("#out").innerHTML=resHTML(p,true)+'<div class="row" style="margin-top:16px"><span class="hint">Enregistré dans vos projets (privé).</span><button class="btn" id="pubn">Publier dans Explorer</button><button class="btn ghost" data-go="profile">Voir mes projets</button></div>';
   bind();$("#pubn").onclick=function(){var x=projects();x.forEach(function(r){if(r.id===p.id)r.public=true});save(x);this.disabled=true;this.textContent="Publié";refreshExp();toast("Publié dans Explorer")};$("#out").scrollIntoView({behavior:"smooth",block:"start"});
  }).catch(function(err){
+  tm.forEach(clearTimeout);st.style.color="#FF6B6B";
   busy=false;go.disabled=false;go.textContent="Créer avec auraii";pg.style.display="none";bar.style.width="0";
-  console.error(err);st.textContent=(err&&err.message&&err.message!=="Failed to fetch")?err.message:"La création a échoué. Vérifiez votre connexion et réessayez."});
+  console.error(err);st.textContent=(err&&err.message&&err.message!=="Failed to fetch")?err.message:"Impossible de joindre le serveur IA. S’il se réveille, réessayez dans une minute. Sinon, vérifiez l’adresse du serveur (API_URL) et ALLOWED_ORIGIN."});
 }
 // ============================================================
 // 7. PAGE PROFIL : liste des projets, public/privé, suppression
