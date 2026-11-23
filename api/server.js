@@ -23,7 +23,7 @@
 import http from "node:http";
 
 const PORT = process.env.PORT || 10000;
-const MODEL = "llama-3.3-70b-versatile";
+const MODEL = "openai/gpt-oss-20b";
 const PAUSE_MS = 8000; // pause minimale entre deux créations d'une même personne
 
 // Mêmes mots interdits que sur le site
